@@ -1,0 +1,38 @@
+name: Build+Test
+
+on: [push]
+
+jobs:
+  build:
+    name: Build library
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Pull the repository
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+          submodules: false
+      - name: Prepare env
+        run: |
+          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+      - name: Build
+        run: |
+          cd src/
+          make C_COMPILER=clang-11 CPP_COMPILER=clang++-11
+  format:
+    name: Code formatting
+    runs-on: ubuntu-20.04
+    steps:
+       - name: Pull the repository
+         uses: actions/checkout@v1
+         with:
+           fetch-depth: 1
+           submodules: false
+       - name: Prepare env
+         run: |
+           sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+           sudo apt-get install -y clang-format-11
+       - name: Build
+         run: |
+           cd src
+           make format CF_FAIL_ON_DIFF=1 CLANG_FORMAT=clang-format-11
